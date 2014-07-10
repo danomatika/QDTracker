@@ -1,30 +1,15 @@
 #include "ofApp.h"
 
+#include "XmlSettings.h"
+
 //--------------------------------------------------------------
 void ofApp::setup(){
 
 	ofSetVerticalSync(true);
 	
 	// settings
-	threshold = 160;
-	nearClipping = 500;
-	farClipping = 4000;
-	highestPointThreshold = 50;
-	headInterpolation = 0.6;
-	
-	bNormalizeX = false;
-	bNormalizeY = false;
-	bNormalizeZ = false;
-	
-	bScaleX = false;
-	bScaleY = false;
-	bScaleZ = false;
-	
-	scaleXAmt = 1.0;
-	scaleYAmt = 1.0;
-	scaleZAmt = 1.0;
-	
-	bShowRGB = false;
+	resetSettings();
+	loadSettings();
 	
 	// setup kinect
 	kinect.init(false); // no IR image
@@ -72,14 +57,25 @@ void ofApp::update(){
 			// compute rough head position between centroid and highest point
 			head = person.position.getInterpolated(highestPoint, headInterpolation);
 			head.z = kinect.getDistanceAt(head);
+			headAdj = head;
 			
-			if(bNormalizeX) head.x = ofMap(head.x, 0, kinect.width, 0, 1);
-			if(bNormalizeY) head.y = ofMap(head.y, 0, kinect.height, 0, 1);
-			if(bNormalizeZ) head.z = ofMap(head.z, kinect.getNearClipping(), kinect.getFarClipping(), 0, 1);
+			// normalize values
+			if(bNormalizeX) headAdj.x = ofMap(head.x, 0, kinect.width, 0, 1);
+			if(bNormalizeY) headAdj.y = ofMap(head.y, 0, kinect.height, 0, 1);
+			if(bNormalizeZ) headAdj.z = ofMap(head.z, kinect.getNearClipping(), kinect.getFarClipping(), 0, 1);
 			
-			if(bScaleX) head.x *= scaleXAmt;
-			if(bScaleY) head.y *= scaleYAmt;
-			if(bScaleZ) head.z *= scaleZAmt;
+			// scale values
+			if(bScaleX) headAdj.x *= scaleXAmt;
+			if(bScaleY) headAdj.y *= scaleYAmt;
+			if(bScaleZ) headAdj.z *= scaleZAmt;
+			
+			// send head position
+			ofxOscMessage message;
+			message.setAddress("/head");
+			message.addFloatArg(headAdj.x);
+			message.addFloatArg(headAdj.y);
+			message.addFloatArg(headAdj.z);
+			sender.sendMessage(message);
 		}
 	}
 }
@@ -119,7 +115,7 @@ void ofApp::draw(){
 		
 		// draw current position
 		ofSetColor(255);
-		ofDrawBitmapString(ofToString(head.x, 2)+" "+ofToString(head.y, 2)+" "+ofToString(head.z, 2), 12, 12);
+		ofDrawBitmapString(ofToString(headAdj.x, 2)+" "+ofToString(headAdj.y, 2)+" "+ofToString(headAdj.z, 2), 12, 12);
 	}
 	
 	ofSetColor(255);
@@ -160,5 +156,166 @@ void ofApp::keyPressed(int key){
 		case 'r':
 			bShowRGB = !bShowRGB;
 			break;
+			
+		case 's':
+			saveSettings();
+			break;
+			
+		case 'l':
+			loadSettings();
+			break;
+			
+		case 'R':
+			resetSettings();
+			break;
 	}
+}
+
+//--------------------------------------------------------------
+void ofApp::resetSettings() {
+	
+	threshold = 160;
+	nearClipping = 500;
+	farClipping = 4000;
+	highestPointThreshold = 50;
+	headInterpolation = 0.6;
+	
+	bNormalizeX = false;
+	bNormalizeY = false;
+	bNormalizeZ = false;
+	
+	bScaleX = false;
+	bScaleY = false;
+	bScaleZ = false;
+	
+	scaleXAmt = 1.0;
+	scaleYAmt = 1.0;
+	scaleZAmt = 1.0;
+	
+	bShowRGB = false;
+	
+	sendAddress = "127.0.0.1";
+	sendPort = 9000;
+
+	// setup osc
+	sender.setup(sendAddress, sendPort);
+}
+
+//--------------------------------------------------------------
+bool ofApp::loadSettings(const string xmlFile) {
+	ofxXmlSettings xml;
+	if(!xml.loadFile(xmlFile)) {
+		ofLogWarning() << "Couldn't load settings: "
+			<< xml.doc.ErrorRow() << ", " << xml.doc.ErrorCol()
+			<< " " << xml.doc.ErrorDesc();
+			return false;
+	}
+	
+	xml.pushTag("settings");
+		
+		bShowRGB = xml.getValue("bShowRGB", bShowRGB);
+		
+		xml.pushTag("tracking");
+			threshold = xml.getValue("threshold", threshold);
+			nearClipping = xml.getValue("nearClipping", (int)nearClipping);
+			farClipping = xml.getValue("farClipping", (int)farClipping);
+			highestPointThreshold = xml.getValue("highestPointThreshold", (int)highestPointThreshold);
+			headInterpolation = xml.getValue("headInterpolation", headInterpolation);
+		xml.popTag();
+		
+		xml.pushTag("normalize");
+			bNormalizeX = xml.getValue("bNormalizeX", bNormalizeX);
+			bNormalizeY = xml.getValue("bNormalizeY", bNormalizeY);
+			bNormalizeZ = xml.getValue("bNormalizeZ", bNormalizeZ);
+		xml.popTag();
+		
+		xml.pushTag("scale");
+			bScaleX = xml.getValue("bScaleX", bScaleX);
+			bScaleY = xml.getValue("bScaleY", bScaleY);
+			bScaleZ = xml.getValue("bScaleZ", bScaleZ);
+			scaleXAmt = xml.getValue("scaleXAmt", scaleXAmt);
+			scaleYAmt = xml.getValue("scaleYAmt", scaleYAmt);
+			scaleZAmt = xml.getValue("scaleZAmt", scaleZAmt);
+		xml.popTag();
+		
+		xml.pushTag("osc");
+			sendAddress = xml.getValue("sendAddress", sendAddress);
+			sendPort = xml.getValue("sendPort", (int)sendPort);
+		xml.popTag();
+		
+	xml.popTag();
+	
+	// setup osc
+	sender.setup(sendAddress, sendPort);
+	
+	return true;
+}
+
+//--------------------------------------------------------------
+bool ofApp::saveSettings(const string xmlFile) {
+	
+	XmlSettings xml;
+	
+	xml.addTag("settings");
+	xml.pushTag("settings");
+		
+		xml.addComment(" general settings ");
+		xml.addComment(" show the kinect RGB image (1) or depth image? (0); bool 0 or 1 ");
+		xml.addValue("bShowRGB", bShowRGB);
+		
+		xml.addComment(" tracking settings ");
+		xml.addTag("tracking");
+		xml.pushTag("tracking");
+			xml.addComment(" person finder depth clipping threshold; int 0 - 255 ");
+			xml.addValue("threshold", threshold);
+			xml.addComment(" kinect near clipping plane in cm; int ");
+			xml.addValue("nearClipping", (int)nearClipping);
+			xml.addComment(" kinect far clipping plane in cm; int ");
+			xml.addValue("farClipping", (int)farClipping);
+			xml.addComment(" only consider highest points +- this & the person centroid; int ");
+			xml.addValue("highestPointThreshold", (int) highestPointThreshold);
+			xml.addComment(" percentage to interpolate between person centroid & highest point; float 0 - 1");
+			xml.addValue("headInterpolation", headInterpolation);
+		xml.popTag();
+		
+		xml.addComment(" normalize head position coords, enable/disable; bool 0 or 1");
+		xml.addTag("normalize");
+		xml.pushTag("normalize");
+			xml.addComment(" normalized; 0 - width ");
+			xml.addValue("bNormalizeX", bNormalizeX);
+			xml.addComment(" normalized; 0 - height ");
+			xml.addValue("bNormalizeY", bNormalizeY);
+			xml.addComment(" normalized ; nearCLipping - farClipping ");
+			xml.addValue("bNormalizeZ", bNormalizeZ);
+		xml.popTag();
+		
+		xml.addComment(" scale head position coords, performed after normalization ");
+		xml.addTag("scale");
+		xml.pushTag("scale");
+			xml.addComment(" enable/disable; bool 0 or 1 ");
+			xml.addValue("bScaleX", bScaleX);
+			xml.addValue("bScaleY", bScaleY);
+			xml.addValue("bScaleZ", bScaleZ);
+			xml.addComment(" scale amounts ");
+			xml.addValue("scaleXAmt", scaleXAmt);
+			xml.addValue("scaleYAmt", scaleXAmt);
+			xml.addValue("scaleZAmt", scaleZAmt);
+		xml.popTag();
+		
+		xml.addComment(" osc settings ");
+		xml.addTag("osc");
+		xml.pushTag("osc");
+			xml.addComment(" host destination address ");
+			xml.addValue("sendAddress", sendAddress);
+			xml.addComment(" host destination port ");
+			xml.addValue("sendPort", (int)sendPort);
+		xml.popTag();
+		
+	xml.popTag();
+	
+	if(!xml.saveFile(xmlFile)) {
+		ofLogWarning() << "Couldn't save settings: " << xml.doc.ErrorDesc();
+			return false;
+	}
+	return true;
 }

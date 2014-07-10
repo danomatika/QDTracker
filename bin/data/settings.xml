@@ -1,0 +1,45 @@
+<settings>
+    <!-- general settings -->
+    <!-- show the kinect RGB image (1) or depth image? (0); bool 0 or 1 -->
+    <bShowRGB>0</bShowRGB>
+    <!-- tracking settings -->
+    <tracking>
+        <!-- person finder depth clipping threshold; int 0 - 255 -->
+        <threshold>160</threshold>
+        <!-- kinect near clipping plane in cm; int -->
+        <nearClipping>500</nearClipping>
+        <!-- kinect far clipping plane in cm; int -->
+        <farClipping>4000</farClipping>
+        <!-- only consider highest points +- this & the person centroid; int -->
+        <highestPointThreshold>50</highestPointThreshold>
+        <!-- percentage to interpolate between person centroid & highest point; float 0 - 1-->
+        <headInterpolation>0.600000024</headInterpolation>
+    </tracking>
+    <!-- normalize head position coords, enable/disable; bool 0 or 1-->
+    <normalize>
+        <!-- normalized; 0 - width -->
+        <bNormalizeX>0</bNormalizeX>
+        <!-- normalized; 0 - height -->
+        <bNormalizeY>0</bNormalizeY>
+        <!-- normalized; nearCLipping - farClipping -->
+        <bNormalizeZ>0</bNormalizeZ>
+    </normalize>
+    <!-- scale head position coords, performed after normalization -->
+    <scale>
+        <!-- enable/disable; bool 0 or 1 -->
+        <bScaleX>0</bScaleX>
+        <bScaleY>0</bScaleY>
+        <bScaleZ>0</bScaleZ>
+        <!-- scale amounts -->
+        <scaleXAmt>1.000000000</scaleXAmt>
+        <scaleYAmt>1.000000000</scaleYAmt>
+        <scaleZAmt>1.000000000</scaleZAmt>
+    </scale>
+    <!-- osc settings -->
+    <osc>
+        <!-- host destination address -->
+        <sendAddress>127.0.0.1</sendAddress>
+        <!-- host destination port -->
+        <sendPort>9000</sendPort>
+    </osc>
+</settings>

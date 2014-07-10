@@ -5,6 +5,7 @@
 *.perspectivev3
 xcuserdata
 xcshareddata
+*.xcworkspace
 build
 *.app
 *.a
