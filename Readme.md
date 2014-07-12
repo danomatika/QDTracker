@@ -18,7 +18,7 @@ Components
 
 **front facing head approximation**
 
-Sends the OSC message: /head x y z
+Sends the OSC message: `/head x y z`
 
 ### OverHeadOSC
 
@@ -28,7 +28,7 @@ Sends the OSC message: /head x y z
 
 **overhead blob & highest point finding**
 
-Sends the OSC message: /overhead x y z
+Sends the OSC message: `/overhead x y z`
 
 Coordinate Data
 ---------------
