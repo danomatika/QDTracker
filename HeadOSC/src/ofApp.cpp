@@ -107,13 +107,20 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-	// draw RGB or IR image
+	// draw display image
 	ofSetColor(255);
-	if(bShowRGB) {
-		kinect.draw(0, 0);
-	}
-	else {
-		kinect.drawDepth(0, 0);
+	switch(displayImage) {
+		case THRESHOLD:
+			depthDiff.draw(0, 0);
+			break;
+		case RGB:
+			kinect.draw(0, 0);
+			break;
+		case DEPTH:
+			kinect.drawDepth(0, 0);
+			break;
+		default: // NONE
+			break;
 	}
 
 	if(personFinder.blobs.size() > 0) {
@@ -177,9 +184,16 @@ void ofApp::keyPressed(int key){
 			bNormalizeZ = !bNormalizeZ;
 			break;
 			
-		case 'r':
-			bShowRGB = !bShowRGB;
+		case 'd': {
+			// increment enum
+			int d = (int)displayImage;
+			d++;
+			if(d > DEPTH) {
+				d = (int)NONE;
+			}
+			displayImage = (DisplayImage)d;
 			break;
+		}
 			
 		case 's':
 			saveSettings();
@@ -218,7 +232,7 @@ void ofApp::resetSettings() {
 	scaleYAmt = 1.0;
 	scaleZAmt = 1.0;
 	
-	bShowRGB = false;
+	displayImage = THRESHOLD;
 	kinectID = 0;
 	
 	sendAddress = "127.0.0.1";
@@ -240,7 +254,7 @@ bool ofApp::loadSettings(const string xmlFile) {
 	
 	xml.pushTag("settings");
 		
-		bShowRGB = xml.getValue("bShowRGB", bShowRGB);
+		displayImage = (DisplayImage)xml.getValue("displayImage", displayImage);
 		kinectID = xml.getValue("kinectID", (int)kinectID);
 		
 		xml.pushTag("tracking");
@@ -295,8 +309,8 @@ bool ofApp::saveSettings(const string xmlFile) {
 		xml.addComment(" general settings ");
 		xml.addComment(" which kinect ID to open (note: doesn't change when reloading); int ");
 		xml.addValue("kinectID", (int)kinectID);
-		xml.addComment(" show the kinect RGB image (1) or depth image? (0); bool 0 or 1 ");
-		xml.addValue("bShowRGB", bShowRGB);
+		xml.addComment(" display image: 0 - none, 1 - threshold, 2 - RGB, 3 - depth");
+		xml.addValue("displayImage", displayImage);
 		
 		xml.addComment(" tracking settings ");
 		xml.addTag("tracking");

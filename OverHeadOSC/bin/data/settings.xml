@@ -2,8 +2,8 @@
     <!-- general settings -->
     <!-- which kinect ID to open (note: doesn't change when reloading); int -->
     <kinectID>0</kinectID>
-    <!-- show the kinect RGB image (1) or depth image? (0); bool 0 or 1 -->
-    <bShowRGB>0</bShowRGB>
+    <!-- display image: 0 - none, 1 - threshold, 2 - RGB, 3 - depth-->
+    <displayImage>1</displayImage>
     <!-- tracking settings -->
     <tracking>
         <!-- person finder depth clipping threshold; int 0 - 255 -->

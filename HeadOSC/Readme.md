@@ -57,7 +57,7 @@ see settings file comments for info: `data/settings.xml`
 Key Commands
 ------------
 
-* r: toggle rgb & depth image
+* d: toggle display image type: threshold, RGB, depth, none
 * =/-: increase/decrease kinect depth threshold
 * s: save settings
 * l: load settings

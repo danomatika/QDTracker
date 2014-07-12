@@ -78,7 +78,13 @@ class ofApp : public ofBaseApp{
 		bool bScaleX, bScaleY, bScaleZ;
 		float scaleXAmt, scaleYAmt, scaleZAmt; // how much to scale
 		
-		bool bShowRGB; // show RGB image (true) or show depth image (false)?
+		// live image to display
+		enum DisplayImage {
+			NONE = 0,
+			THRESHOLD = 1,
+			RGB = 2,
+			DEPTH = 3
+		} displayImage;
 		
 		// osc send destination
 		string sendAddress;
