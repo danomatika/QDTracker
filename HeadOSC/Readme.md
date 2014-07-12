@@ -18,7 +18,7 @@ Algorithm
 ---------
 
 <p align="center">
-	<img src="https://raw.github.com/danomatika/QDTracker/master/HeadOSC/sketch.png"/>
+	<img src="https://raw.github.com/danomatika/QDTracker/master/HeadOSC/sketch.jpg"/>
 </p>
 
 * find person

@@ -13,7 +13,7 @@ Components
 ### HeadOSC
 
 <p align="center">
-	<img src="https://raw.github.com/danomatika/QDTracker/master/HeadOSC/screenshot.png"/>
+	<img src="https://raw.githubusercontent.com/danomatika/QDTracker/master/HeadOSC/screenshot.png"/>
 </p>
 
 **front facing head approximation**
@@ -23,7 +23,7 @@ Sends the OSC message: /head x y z
 ### OverHeadOSC
 
 <p align="center">
-	<img src="https://raw.github.com/danomatika/QDTracker/master/OverHeadOSC/screenshot.png"/>
+	<img src="https://raw.githubusercontent.com/danomatika/QDTracker/master/OverHeadOSC/screenshot.png"/>
 </p>
 
 **overhead blob & highest point finding**
