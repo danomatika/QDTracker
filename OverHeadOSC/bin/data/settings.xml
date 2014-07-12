@@ -13,24 +13,20 @@
         <!-- kinect far clipping plane in cm; int -->
         <farClipping>4000</farClipping>
         <!-- minimum area to consider when looking for person blobs; int -->
-        <personMinArea>3000</personMinArea>
+        <personMinArea>5</personMinArea>
         <!-- maximum area to consider when looking for person blobs; int -->
-        <personMaxArea>153600</personMaxArea>
-        <!-- only consider highest points +- this & the person centroid; int -->
-        <highestPointThreshold>50</highestPointThreshold>
-        <!-- percentage to interpolate between person centroid & highest point; float 0 - 1-->
-        <headInterpolation>0.600000024</headInterpolation>
+        <personMaxArea>3000</personMaxArea>
     </tracking>
-    <!-- normalize head position coords, enable/disable; bool 0 or 1 -->
+    <!-- normalize overhead position coords, enable/disable; bool 0 or 1 -->
     <normalize>
         <!-- normalized; 0 - width -->
         <bNormalizeX>0</bNormalizeX>
         <!-- normalized; 0 - height -->
         <bNormalizeY>0</bNormalizeY>
-        <!-- normalized ; nearCLipping - farClipping -->
+        <!-- normalized ; nearClipping - farClipping -->
         <bNormalizeZ>0</bNormalizeZ>
     </normalize>
-    <!-- scale head position coords, performed after normalization -->
+    <!-- scale overhead position coords, performed after normalization -->
     <scale>
         <!-- enable/disable; bool 0 or 1 -->
         <bScaleX>0</bScaleX>

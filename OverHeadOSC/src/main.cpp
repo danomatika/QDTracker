@@ -1,5 +1,5 @@
 /*
- * HeadOSC, part of the Quick N Dirty Tracking system
+ * OverHeadOSC, part of the Quick N Dirty Tracking system
  *
  * Copyright (c) 2014 Dan Wilcox <danomatika@gmail.com>
  *
@@ -19,16 +19,10 @@
  * See https://github.com/danomatika/QDTracker for documentation
  *
  */
-#pragma once
+#include "ofMain.h"
+#include "ofApp.h"
 
-#include "ofxXmlSettings.h"
-
-// tiny wrapper to allow adding of xml comments
-class XmlSettings : public ofxXmlSettings {
-	public:
-	
-		void addComment(const std::string text) {
-			TiXmlComment comment(text.c_str());
-			storedHandle.ToNode()->InsertEndChild(comment);
-		}
-};
+int main(){
+	ofSetupOpenGL(640, 480, OF_WINDOW);
+	ofRunApp(new ofApp());
+}

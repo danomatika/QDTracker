@@ -1,5 +1,5 @@
 /*
- * HeadOSC, part of the Quick N Dirty Tracking system
+ * OverHeadOSC, part of the Quick N Dirty Tracking system
  *
  * Copyright (c) 2014 Dan Wilcox <danomatika@gmail.com>
  *
@@ -66,39 +66,28 @@ void ofApp::update(){
 			person.position = blob.centroid;
 			person.width = blob.boundingRect.width;
 			person.height = blob.boundingRect.height;
-			
-			// find highest contour point (actually the lowest value since top is 0)
-			int height = INT_MAX;
-			for(int i = 0; i < blob.pts.size(); ++i) {
-				ofPoint &p = blob.pts[i];
-				if(p.y < height &&
-				  (p.x > person.x-highestPointThreshold && p.x < person.x+highestPointThreshold)) {
-					highestPoint = blob.pts[i];
-					height = blob.pts[i].y;
-				}
-			}
-			
-			// compute rough head position between centroid and highest point
-			head = person.position.getInterpolated(highestPoint, headInterpolation);
-			head.z = kinect.getDistanceAt(head);
-			headAdj = head;
+
+			// find the closest point in the person blob
+			overhead = findNearestPoint(kinect.getDepthPixelsRef(), person);
+			overhead.z = kinect.getDistanceAt(overhead.x, overhead.y);
+			overheadAdj = overhead;
 			
 			// normalize values
-			if(bNormalizeX) headAdj.x = ofMap(head.x, 0, kinect.width, 0, 1);
-			if(bNormalizeY) headAdj.y = ofMap(head.y, 0, kinect.height, 0, 1);
-			if(bNormalizeZ) headAdj.z = ofMap(head.z, kinect.getNearClipping(), kinect.getFarClipping(), 0, 1);
+			if(bNormalizeX) overheadAdj.x = ofMap(overhead.x, 0, kinect.width, 0, 1);
+			if(bNormalizeY) overheadAdj.y = ofMap(overhead.y, 0, kinect.height, 0, 1);
+			if(bNormalizeZ) overheadAdj.z = ofMap(overhead.z, kinect.getNearClipping(), kinect.getFarClipping(), 0, 1);
 			
 			// scale values
-			if(bScaleX) headAdj.x *= scaleXAmt;
-			if(bScaleY) headAdj.y *= scaleYAmt;
-			if(bScaleZ) headAdj.z *= scaleZAmt;
+			if(bScaleX) overheadAdj.x *= scaleXAmt;
+			if(bScaleY) overheadAdj.y *= scaleYAmt;
+			if(bScaleZ) overheadAdj.z *= scaleZAmt;
 			
 			// send head position
 			ofxOscMessage message;
-			message.setAddress("/head");
-			message.addFloatArg(headAdj.x);
-			message.addFloatArg(headAdj.y);
-			message.addFloatArg(headAdj.z);
+			message.setAddress("/overhead");
+			message.addFloatArg(overheadAdj.x);
+			message.addFloatArg(overheadAdj.y);
+			message.addFloatArg(overheadAdj.z);
 			sender.sendMessage(message);
 		}
 	}
@@ -127,19 +116,14 @@ void ofApp::draw(){
 		ofSetColor(255, 0, 255);
 		ofRect(person.position, 10, 10);
 		
-		// gold - highest point
-		ofFill();
-		ofSetColor(255, 255, 0);
-		ofRect(highestPoint, 10, 10);
-		
-		// light blue - "head" position
+		// light blue - overhead "head" position
 		ofFill();
 		ofSetColor(0, 255, 255);
-		ofRect(head.x, head.y, 10, 10);
+		ofRect(overhead.x, overhead.y, 10, 10);
 		
 		// draw current position
 		ofSetColor(255);
-		ofDrawBitmapString(ofToString(headAdj.x, 2)+" "+ofToString(headAdj.y, 2)+" "+ofToString(headAdj.z, 2), 12, 12);
+		ofDrawBitmapString(ofToString(overheadAdj.x, 2)+" "+ofToString(overheadAdj.y, 2)+" "+ofToString(overheadAdj.z, 2), 12, 12);
 	}
 	
 	ofSetColor(255);
@@ -201,10 +185,8 @@ void ofApp::resetSettings() {
 	threshold = 160;
 	nearClipping = 500;
 	farClipping = 4000;
-	personMinArea = 3000;
-	personMaxArea = 640*480*0.5;
-	highestPointThreshold = 50;
-	headInterpolation = 0.6;
+	personMinArea = 5;
+	personMaxArea = 3000;
 	
 	bNormalizeX = false;
 	bNormalizeY = false;
@@ -249,8 +231,6 @@ bool ofApp::loadSettings(const string xmlFile) {
 			farClipping = xml.getValue("farClipping", (int)farClipping);
 			personMinArea = xml.getValue("personMinArea", (int)personMinArea);
 			personMaxArea = xml.getValue("personMaxArea", (int)personMaxArea);
-			highestPointThreshold = xml.getValue("highestPointThreshold", (int)highestPointThreshold);
-			headInterpolation = xml.getValue("headInterpolation", headInterpolation);
 		xml.popTag();
 		
 		xml.pushTag("normalize");
@@ -311,24 +291,20 @@ bool ofApp::saveSettings(const string xmlFile) {
 			xml.addValue("personMinArea", (int)personMinArea);
 			xml.addComment(" maximum area to consider when looking for person blobs; int ");
 			xml.addValue("personMaxArea", (int)personMaxArea);
-			xml.addComment(" only consider highest points +- this & the person centroid; int ");
-			xml.addValue("highestPointThreshold", (int) highestPointThreshold);
-			xml.addComment(" percentage to interpolate between person centroid & highest point; float 0 - 1" );
-			xml.addValue("headInterpolation", headInterpolation);
 		xml.popTag();
 		
-		xml.addComment(" normalize head position coords, enable/disable; bool 0 or 1 ");
+		xml.addComment(" normalize overhead position coords, enable/disable; bool 0 or 1 ");
 		xml.addTag("normalize");
 		xml.pushTag("normalize");
 			xml.addComment(" normalized; 0 - width ");
 			xml.addValue("bNormalizeX", bNormalizeX);
 			xml.addComment(" normalized; 0 - height ");
 			xml.addValue("bNormalizeY", bNormalizeY);
-			xml.addComment(" normalized ; nearCLipping - farClipping ");
+			xml.addComment(" normalized ; nearClipping - farClipping ");
 			xml.addValue("bNormalizeZ", bNormalizeZ);
 		xml.popTag();
 		
-		xml.addComment(" scale head position coords, performed after normalization ");
+		xml.addComment(" scale overhead position coords, performed after normalization ");
 		xml.addTag("scale");
 		xml.pushTag("scale");
 			xml.addComment(" enable/disable; bool 0 or 1 ");
@@ -357,4 +333,29 @@ bool ofApp::saveSettings(const string xmlFile) {
 			return false;
 	}
 	return true;
+}
+
+//--------------------------------------------------------------
+ofPoint ofApp::findNearestPoint(ofPixels& pixels, ofRectangle searchBox, int maxValue) {
+
+	int minX = MAX(searchBox.getLeft(), 0);
+	int minY = MAX(searchBox.getTop(), 0);
+	int maxX = MIN(searchBox.getRight(), pixels.getWidth());
+	int maxY = MIN(searchBox.getBottom(), pixels.getHeight());
+
+	ofPoint nearest;
+	unsigned char brightest = 0;
+	for(int y = minY; y < maxY; ++y) {
+		for(int x = minX; x < maxX; ++x) {
+			unsigned char val = pixels[y*pixels.getWidth() + x];
+			if(val < maxValue && val > brightest) {
+				brightest = val;
+				nearest.x = x;
+				nearest.y = y;
+				nearest.z = val;
+			}
+		}
+	}
+	
+	return nearest;
 }

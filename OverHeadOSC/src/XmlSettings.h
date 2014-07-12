@@ -1,5 +1,5 @@
 /*
- * HeadOSC, part of the Quick N Dirty Tracking system
+ * OverHeadOSC, part of the Quick N Dirty Tracking system
  *
  * Copyright (c) 2014 Dan Wilcox <danomatika@gmail.com>
  *

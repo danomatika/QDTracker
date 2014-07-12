@@ -1,5 +1,5 @@
 /*
- * HeadOSC, part of the Quick N Dirty Tracking system
+ * OverHeadOSC, part of the Quick N Dirty Tracking system
  *
  * Copyright (c) 2014 Dan Wilcox <danomatika@gmail.com>
  *
@@ -44,6 +44,10 @@ class ofApp : public ofBaseApp{
 		void resetSettings();
 		bool loadSettings(const string xmlFile=SETTINGS);
 		bool saveSettings(const string xmlFile=SETTINGS);
+		
+		// find the nearest (aka brightest) point in a given area of depth pixels
+		// from Kinect Titty Tracker
+		ofPoint findNearestPoint(ofPixels& pixels, ofRectangle searchBox, int maxValue=256);
 
 		ofxKinect kinect;		// our RGB/depth camera of course
 		ofxOscSender sender;	// for sending head position
@@ -57,16 +61,13 @@ class ofApp : public ofBaseApp{
 		
 		// positions
 		ofRectangle person;		// found person centroid & size
-		ofPoint highestPoint;	// highest point in the person contour
-		ofPoint head;			// found head position
-		ofPoint headAdj;		// adjuest head position after normalize & scale
+		ofPoint overhead;			// found overhead position
+		ofPoint overheadAdj;		// adjuest overhead position after normalize & scale
 		
 		// settings
 		int threshold;	// person finder depth clipping threshold (0-255)
 		unsigned int nearClipping, farClipping; // kinect clipping planes in cm
 		unsigned int personMinArea, personMaxArea; // min and max area for the person finder
-		unsigned int highestPointThreshold;	// only consider highest points +- this & the person centroid
-		float headInterpolation; // percentage to interpolate between person centroid & highest point (0-1)
 		
 		// normalize the head coordinates?
 		bool bNormalizeX; // 0-kinect.width
