@@ -35,7 +35,7 @@ pros:
 cons:
 
 * only tracks 1 "person" aka sufficiently large thing
-* requires empty space, distracted by other suffciently large things
+* requires empty space, distracted by other sufficiently large things
 * not truely 3d, more like 2.5 since it's only from 1 perspective
 * no orientation data (aka looking up, looking down, etc)
 
