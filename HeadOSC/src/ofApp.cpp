@@ -25,7 +25,7 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup(){
+void ofApp::setup() {
 
 	ofSetVerticalSync(true);
 	
@@ -45,7 +45,7 @@ void ofApp::setup(){
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::update() {
 	ofBackground(0, 0, 0);
 
 	kinect.update();
@@ -80,8 +80,6 @@ void ofApp::update(){
 			head = glm::vec3(person.position.x*(1-headInterpolation) + highestPoint.x*headInterpolation,
 							 person.position.y*(1-headInterpolation) + highestPoint.y*headInterpolation,
 							 kinect.getDistanceAt(head));
-			//head = person.position.getInterpolated(highestPoint, headInterpolation);
-			//head.z = kinect.getDistanceAt(head);
 			headAdj = head;
 			
 			// normalize values
@@ -106,7 +104,7 @@ void ofApp::update(){
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw() {
 
 	// draw display image
 	ofSetColor(255);
@@ -155,12 +153,12 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
-void ofApp::exit(){
+void ofApp::exit() {
 	kinect.close();
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key) {
 	switch(key) {
 		
 		case '-':

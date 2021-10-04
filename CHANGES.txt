@@ -1,3 +1,10 @@
+0.2.0: 2021 Oct 05
+
+* added changelog
+* updated for OF 11
+* renamed documentation txt files
+* removed generated project files
+
 0.1.0: 2021 Sep 10
 
 initial version for OF 0.8

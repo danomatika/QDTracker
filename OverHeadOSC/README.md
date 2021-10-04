@@ -9,7 +9,7 @@ computes simple kinect overhead approximation & sends position over OSC
 
 *kinect 1 / xbox 360 kinect only*
 
-2014 Dan Wilcox <danomatika@gmail.com> GPL v3
+2014-2021 Dan Wilcox <danomatika@gmail.com> GPL v3
 
 See <https://github.com/danomatika/QDTracker> for documentation
 

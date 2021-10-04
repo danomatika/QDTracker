@@ -1,8 +1,10 @@
 
+# project generated files
 Makefile
 *.xcodeproj
 *.xcconfig
 openFrameworks-Info.plist
+config.make
 
 #########################
 # general patterns

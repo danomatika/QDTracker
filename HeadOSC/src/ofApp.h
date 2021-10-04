@@ -32,7 +32,7 @@
 
 #define SETTINGS "settings.xml"
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp {
 
 	public:
 		void setup();
@@ -59,7 +59,7 @@ class ofApp : public ofBaseApp{
 		ofRectangle person;     // found person centroid & size
 		glm::vec3 highestPoint; // highest point in the person contour
 		glm::vec3 head;         // found head position
-		glm::vec3 headAdj;      // adjuest head position after normalize & scale
+		glm::vec3 headAdj;      // adjust head position after normalize & scale
 		
 		// settings
 		int threshold; // person finder depth clipping threshold (0-255)

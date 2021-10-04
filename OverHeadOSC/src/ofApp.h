@@ -32,7 +32,7 @@
 
 #define SETTINGS "settings.xml"
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp {
 
 	public:
 		void setup();
@@ -62,7 +62,7 @@ class ofApp : public ofBaseApp{
 		// positions
 		ofRectangle person;  // found person centroid & size
 		ofPoint overhead;    // found overhead position
-		ofPoint overheadAdj; // adjuest overhead position after normalize & scale
+		ofPoint overheadAdj; // adjust overhead position after normalize & scale
 		
 		// settings
 		int threshold;	// person finder depth clipping threshold (0-255)
