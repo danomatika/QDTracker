@@ -42,17 +42,46 @@ cons:
 Build Requirements
 ------------------
 
-* OpenFrameworks 0.8+
+* OpenFrameworks
 * addons (all included with the OF download):
   * ofxKinect 
   * ofxOpenCv
   * ofxOsc
-  * ofxXmlSettigs
 
 Settings
 --------
 
-see settings file comments for info: `data/settings.xml`
+XML settings file tags and sections, ex. `data/settings.xml`
+
+general
+* kinectID: which kinect ID to open (note: doesn't change when reloading); int 
+* displayImage: display image: 0 - none, 1 - threshold, 2 - RGB, 3 - depth
+
+tracking
+* threshold: person finder depth clipping threshold; int 0 - 255
+* nearClipping: kinect near clipping plane in cm; int
+* farClipping: kinect far clipping plane in cm; int
+* personMinArea: minimum area to consider when looking for person blobs; int
+* personFarArea: maximum area to consider when looking for person blobs; int
+* highestPointThreshold: only consider highest points +- this & the person centroid; int
+* headInterpolation: percentage to interpolate between person centroid & highest point; float 0 - 1
+
+normalize
+* bNormalizeX: normalize head position X coord, enable/disable; bool 0 or 1
+* bNormalizeY: normalize head position Y coord, enable/disable; bool 0 or 1
+* bNormalizeZ: normalize head position Z coord, enable/disable; bool 0 or 1
+
+scale
+* bScaleX: scale head position X coord, performed after normalization, enable/disable; bool 0 or 1
+* bScaleY: scale head position Y coord, performed after normalization, enable/disable; bool 0 or 1
+* bScaleZ: scale head position Z coord, performed after normalization, enable/disable; bool 0 or 1
+* scaleXAmt: scale amount for X coord
+* scaleYAmt: scale amount for Y coord
+* scaleZAmt: scale amount for Z coord
+
+osc
+* sendAddress: host destination address
+* sendPort: host destination port
 
 Key Commands
 ------------

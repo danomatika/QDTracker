@@ -39,10 +39,27 @@ Values, unless normalized and/or scaled (see settings):
 * y: 0 - 480 (kinect depth image height)
 * z: distance in centimeters (kinect nearClipping - farClipping)
 
-
 Downloading
 -----------
 
 Git clone/download this repo into your OpenFrameworks `/apps` directory.
 
+Installation & Build
+--------------------
 
+Overview:
+
+1. Generate the project files for this folder using the OF ProjectGenerator
+2. Build for your platform
+
+### Generating Project Files
+
+Project files are not included so you will need to generate the project files for your operating system and development environment using the OF ProjectGenerator which is included with the openFrameworks distribution.
+
+To (re)generate project files for an existing project:
+
+1. Click the "Import" button in the ProjectGenerator
+2. Navigate to the project's parent folder ie. "apps/QDTracker", select the base folder for the example project ie. "HeadOSC", and click the Open button
+3. Click the "Update" button
+
+If everything went Ok, you should now be able to open the generated project and build/run the example.

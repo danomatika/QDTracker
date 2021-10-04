@@ -42,27 +42,27 @@ class ofApp : public ofBaseApp{
 		void keyPressed(int key);
 		
 		void resetSettings();
-		bool loadSettings(const string xmlFile=SETTINGS);
-		bool saveSettings(const string xmlFile=SETTINGS);
+		bool loadSettings(const std::string xmlFile=SETTINGS);
+		bool saveSettings(const std::string xmlFile=SETTINGS);
 		
 		// find the nearest (aka brightest) point in a given area of depth pixels
 		// from Kinect Titty Tracker
 		ofPoint findNearestPoint(ofPixels& pixels, ofRectangle searchBox, int maxValue=256);
 
-		ofxKinect kinect;		// our RGB/depth camera of course
-		ofxOscSender sender;	// for sending head position
+		ofxKinect kinect;    // our RGB/depth camera of course
+		ofxOscSender sender; // for sending head position
 
 		// search images
-		ofxCvGrayscaleImage depthImage;	// grayscale depth image
-		ofxCvGrayscaleImage depthDiff;	// thresholded person finder image
+		ofxCvGrayscaleImage depthImage; // grayscale depth image
+		ofxCvGrayscaleImage depthDiff;  // thresholded person finder image
 
 		// blob trackers
 		ofxCvContourFinder 	personFinder;
 		
 		// positions
-		ofRectangle person;		// found person centroid & size
-		ofPoint overhead;			// found overhead position
-		ofPoint overheadAdj;		// adjuest overhead position after normalize & scale
+		ofRectangle person;  // found person centroid & size
+		ofPoint overhead;    // found overhead position
+		ofPoint overheadAdj; // adjuest overhead position after normalize & scale
 		
 		// settings
 		int threshold;	// person finder depth clipping threshold (0-255)
@@ -87,7 +87,7 @@ class ofApp : public ofBaseApp{
 		} displayImage;
 		
 		// osc send destination
-		string sendAddress;
+		std::string sendAddress;
 		unsigned int sendPort;
 		
 		unsigned int kinectID; // which kinect to use

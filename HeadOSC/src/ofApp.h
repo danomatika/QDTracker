@@ -42,30 +42,30 @@ class ofApp : public ofBaseApp{
 		void keyPressed(int key);
 		
 		void resetSettings();
-		bool loadSettings(const string xmlFile=SETTINGS);
-		bool saveSettings(const string xmlFile=SETTINGS);
+		bool loadSettings(const std::string xmlFile=SETTINGS);
+		bool saveSettings(const std::string xmlFile=SETTINGS);
 
-		ofxKinect kinect;		// our RGB/depth camera of course
-		ofxOscSender sender;	// for sending head position
+		ofxKinect kinect;    // our RGB/depth camera of course
+		ofxOscSender sender; // for sending head position
 
 		// search images
-		ofxCvGrayscaleImage depthImage;	// grayscale depth image
-		ofxCvGrayscaleImage depthDiff;	// thresholded person finder image
+		ofxCvGrayscaleImage depthImage; // grayscale depth image
+		ofxCvGrayscaleImage depthDiff;  // thresholded person finder image
 
 		// blob trackers
 		ofxCvContourFinder 	personFinder;
 		
 		// positions
-		ofRectangle person;		// found person centroid & size
-		ofPoint highestPoint;	// highest point in the person contour
-		ofPoint head;			// found head position
-		ofPoint headAdj;		// adjuest head position after normalize & scale
+		ofRectangle person;     // found person centroid & size
+		glm::vec3 highestPoint; // highest point in the person contour
+		glm::vec3 head;         // found head position
+		glm::vec3 headAdj;      // adjuest head position after normalize & scale
 		
 		// settings
-		int threshold;	// person finder depth clipping threshold (0-255)
+		int threshold; // person finder depth clipping threshold (0-255)
 		unsigned int nearClipping, farClipping; // kinect clipping planes in cm
 		unsigned int personMinArea, personMaxArea; // min and max area for the person finder
-		unsigned int highestPointThreshold;	// only consider highest points +- this & the person centroid
+		unsigned int highestPointThreshold; // only consider highest points +- this & the person centroid
 		float headInterpolation; // percentage to interpolate between person centroid & highest point (0-1)
 		
 		// normalize the head coordinates?
@@ -86,7 +86,7 @@ class ofApp : public ofBaseApp{
 		} displayImage;
 		
 		// osc send destination
-		string sendAddress;
+		std::string sendAddress;
 		unsigned int sendPort;
 		
 		unsigned int kinectID; // which kinect to use

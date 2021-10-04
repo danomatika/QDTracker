@@ -1,47 +1,29 @@
+<?xml version="1.0"?>
 <settings>
-    <!-- general settings -->
-    <!-- which kinect ID to open (note: doesn't change when reloading); int -->
-    <kinectID>0</kinectID>
-    <!-- display image: 0 - none, 1 - threshold, 2 - RGB, 3 - depth-->
-    <displayImage>1</displayImage>
-    <!-- tracking settings -->
-    <tracking>
-        <!-- person finder depth clipping threshold; int 0 - 255 -->
-        <threshold>160</threshold>
-        <!-- kinect near clipping plane in cm; int -->
-        <nearClipping>500</nearClipping>
-        <!-- kinect far clipping plane in cm; int -->
-        <farClipping>4000</farClipping>
-        <!-- minimum area to consider when looking for person blobs; int -->
-        <personMinArea>5</personMinArea>
-        <!-- maximum area to consider when looking for person blobs; int -->
-        <personMaxArea>3000</personMaxArea>
-    </tracking>
-    <!-- normalize overhead position coords, enable/disable; bool 0 or 1 -->
-    <normalize>
-        <!-- normalized; 0 - width -->
-        <bNormalizeX>0</bNormalizeX>
-        <!-- normalized; 0 - height -->
-        <bNormalizeY>0</bNormalizeY>
-        <!-- normalized ; nearClipping - farClipping -->
-        <bNormalizeZ>0</bNormalizeZ>
-    </normalize>
-    <!-- scale overhead position coords, performed after normalization -->
-    <scale>
-        <!-- enable/disable; bool 0 or 1 -->
-        <bScaleX>0</bScaleX>
-        <bScaleY>0</bScaleY>
-        <bScaleZ>0</bScaleZ>
-        <!-- scale amounts -->
-        <scaleXAmt>1.000000000</scaleXAmt>
-        <scaleYAmt>1.000000000</scaleYAmt>
-        <scaleZAmt>1.000000000</scaleZAmt>
-    </scale>
-    <!-- osc settings -->
-    <osc>
-        <!-- host destination address -->
-        <sendAddress>127.0.0.1</sendAddress>
-        <!-- host destination port -->
-        <sendPort>9000</sendPort>
-    </osc>
+	<kinectID>0</kinectID>
+	<displayImage>0</displayImage>
+	<tracking>
+		<threshold>160</threshold>
+		<nearClipping>500</nearClipping>
+		<farClipping>4000</farClipping>
+		<personMinArea>5</personMinArea>
+		<personMaxArea>3000</personMaxArea>
+	</tracking>
+	<normalize>
+		<bNormalizeX>0</bNormalizeX>
+		<bNormalizeY>0</bNormalizeY>
+		<bNormalizeZ>0</bNormalizeZ>
+	</normalize>
+	<scale>
+		<bScaleX>0</bScaleX>
+		<bScaleY>0</bScaleY>
+		<bScaleZ>0</bScaleZ>
+		<scaleXAmt>1</scaleXAmt>
+		<scaleYAmt>1</scaleYAmt>
+		<scaleZAmt>1</scaleZAmt>
+	</scale>
+	<osc>
+		<sendAddress>127.0.0.1</sendAddress>
+		<sendPort>9000</sendPort>
+	</osc>
 </settings>

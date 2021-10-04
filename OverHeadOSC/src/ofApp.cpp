@@ -24,8 +24,6 @@
  */
 #include "ofApp.h"
 
-#include "XmlSettings.h"
-
 //--------------------------------------------------------------
 void ofApp::setup(){
 
@@ -54,7 +52,7 @@ void ofApp::update(){
 	if(kinect.isFrameNew()) { // dont bother if the frames aren't new
 	
 		// find person-sized blobs
-		depthImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
+		depthImage.setFromPixels(kinect.getDepthPixels());
 		depthDiff = depthImage;
 		depthDiff.threshold(threshold);
 		depthDiff.updateTexture();
@@ -68,7 +66,7 @@ void ofApp::update(){
 			person.height = blob.boundingRect.height;
 
 			// find the closest point in the person blob
-			overhead = findNearestPoint(kinect.getDepthPixelsRef(), person);
+			overhead = findNearestPoint(kinect.getDepthPixels(), person);
 			overhead.z = kinect.getDistanceAt(overhead.x, overhead.y);
 			overheadAdj = overhead;
 			
@@ -121,12 +119,12 @@ void ofApp::draw(){
 		// purple - found person centroid
 		ofFill();
 		ofSetColor(255, 0, 255);
-		ofRect(person.position, 10, 10);
+		ofDrawRectangle(person.position, 10, 10);
 		
 		// light blue - overhead "head" position
 		ofFill();
 		ofSetColor(0, 255, 255);
-		ofRect(overhead.x, overhead.y, 10, 10);
+		ofDrawRectangle(overhead.x, overhead.y, 10, 10);
 		
 		// draw current position
 		ofSetColor(255);
@@ -225,49 +223,54 @@ void ofApp::resetSettings() {
 }
 
 //--------------------------------------------------------------
-bool ofApp::loadSettings(const string xmlFile) {
-	ofxXmlSettings xml;
-	if(!xml.loadFile(xmlFile)) {
-		ofLogWarning() << "Couldn't load settings: "
-			<< xml.doc.ErrorRow() << ", " << xml.doc.ErrorCol()
-			<< " " << xml.doc.ErrorDesc();
-			return false;
+bool ofApp::loadSettings(const std::string xmlFile) {
+
+	ofXml xml;
+	if(!xml.load(xmlFile)) {
+		ofLogWarning() << "Couldn't load settings ";
+		return false;
 	}
-	
-	xml.pushTag("settings");
-		
-		displayImage = (DisplayImage)xml.getValue("displayImage", displayImage);
-		kinectID = xml.getValue("kinectID", (int)kinectID);
-		
-		xml.pushTag("tracking");
-			threshold = xml.getValue("threshold", threshold);
-			nearClipping = xml.getValue("nearClipping", (int)nearClipping);
-			farClipping = xml.getValue("farClipping", (int)farClipping);
-			personMinArea = xml.getValue("personMinArea", (int)personMinArea);
-			personMaxArea = xml.getValue("personMaxArea", (int)personMaxArea);
-		xml.popTag();
-		
-		xml.pushTag("normalize");
-			bNormalizeX = xml.getValue("bNormalizeX", bNormalizeX);
-			bNormalizeY = xml.getValue("bNormalizeY", bNormalizeY);
-			bNormalizeZ = xml.getValue("bNormalizeZ", bNormalizeZ);
-		xml.popTag();
-		
-		xml.pushTag("scale");
-			bScaleX = xml.getValue("bScaleX", bScaleX);
-			bScaleY = xml.getValue("bScaleY", bScaleY);
-			bScaleZ = xml.getValue("bScaleZ", bScaleZ);
-			scaleXAmt = xml.getValue("scaleXAmt", scaleXAmt);
-			scaleYAmt = xml.getValue("scaleYAmt", scaleYAmt);
-			scaleZAmt = xml.getValue("scaleZAmt", scaleZAmt);
-		xml.popTag();
-		
-		xml.pushTag("osc");
-			sendAddress = xml.getValue("sendAddress", sendAddress);
-			sendPort = xml.getValue("sendPort", (int)sendPort);
-		xml.popTag();
-		
-	xml.popTag();
+
+	ofXml root = xml.getChild("settings");
+	if(!root) {
+		ofLogWarning() << "Couldn't load settings, missing root \"settings\" tag";
+		return false;
+	}
+
+	kinectID = root.getChild("kinectID").getUintValue();
+	displayImage = (DisplayImage)root.getChild("displayImage").getUintValue();
+
+	ofXml tracking = root.getChild("tracking");
+	if(tracking) {
+		threshold = tracking.getChild("threshold").getIntValue();
+		nearClipping = tracking.getChild("nearClipping").getUintValue();
+		farClipping = tracking.getChild("farClipping").getUintValue();
+		personMinArea = tracking.getChild("personMinArea").getUintValue();
+		personMaxArea = tracking.getChild("personMaxArea").getUintValue();
+	}
+
+	ofXml normalize = root.getChild("normalize");
+	if(normalize) {
+		bNormalizeX = normalize.getChild("bNormalizeX").getBoolValue();
+		bNormalizeY = normalize.getChild("bNormalizeY").getBoolValue();
+		bNormalizeZ = normalize.getChild("bNormalizeZ").getBoolValue();
+	}
+
+	ofXml scale = root.getChild("scale");
+	if(scale) {
+		bScaleX = scale.getChild("bScaleX").getBoolValue();
+		bScaleY = scale.getChild("bScaleY").getBoolValue();
+		bScaleZ = scale.getChild("bScaleZ").getBoolValue();
+		scaleXAmt = scale.getChild("scaleXAmt").getFloatValue();
+		scaleYAmt = scale.getChild("scaleYAmt").getFloatValue();
+		scaleZAmt = scale.getChild("scaleZAmt").getFloatValue();
+	}
+
+	ofXml osc = root.getChild("osc");
+	if(osc) {
+		sendAddress = osc.getChild("sendAddress").getValue();
+		sendPort = osc.getChild("sendPort").getUintValue();
+	}
 	
 	// setup kinect
 	kinect.setDepthClipping(nearClipping, farClipping);
@@ -276,77 +279,165 @@ bool ofApp::loadSettings(const string xmlFile) {
 	sender.setup(sendAddress, sendPort);
 	
 	return true;
+
+
+	// ofxXmlSettings xml;
+	// if(!xml.loadFile(xmlFile)) {
+	// 	ofLogWarning() << "Couldn't load settings: "
+	// 		<< xml.doc.ErrorRow() << ", " << xml.doc.ErrorCol()
+	// 		<< " " << xml.doc.ErrorDesc();
+	// 		return false;
+	// }
+	
+	// xml.pushTag("settings");
+		
+	// 	displayImage = (DisplayImage)xml.getValue("displayImage", displayImage);
+	// 	kinectID = xml.getValue("kinectID", (int)kinectID);
+		
+	// 	xml.pushTag("tracking");
+	// 		threshold = xml.getValue("threshold", threshold);
+	// 		nearClipping = xml.getValue("nearClipping", (int)nearClipping);
+	// 		farClipping = xml.getValue("farClipping", (int)farClipping);
+	// 		personMinArea = xml.getValue("personMinArea", (int)personMinArea);
+	// 		personMaxArea = xml.getValue("personMaxArea", (int)personMaxArea);
+	// 	xml.popTag();
+		
+	// 	xml.pushTag("normalize");
+	// 		bNormalizeX = xml.getValue("bNormalizeX", bNormalizeX);
+	// 		bNormalizeY = xml.getValue("bNormalizeY", bNormalizeY);
+	// 		bNormalizeZ = xml.getValue("bNormalizeZ", bNormalizeZ);
+	// 	xml.popTag();
+		
+	// 	xml.pushTag("scale");
+	// 		bScaleX = xml.getValue("bScaleX", bScaleX);
+	// 		bScaleY = xml.getValue("bScaleY", bScaleY);
+	// 		bScaleZ = xml.getValue("bScaleZ", bScaleZ);
+	// 		scaleXAmt = xml.getValue("scaleXAmt", scaleXAmt);
+	// 		scaleYAmt = xml.getValue("scaleYAmt", scaleYAmt);
+	// 		scaleZAmt = xml.getValue("scaleZAmt", scaleZAmt);
+	// 	xml.popTag();
+		
+	// 	xml.pushTag("osc");
+	// 		sendAddress = xml.getValue("sendAddress", sendAddress);
+	// 		sendPort = xml.getValue("sendPort", (int)sendPort);
+	// 	xml.popTag();
+		
+	// xml.popTag();
+	
+	// // setup kinect
+	// kinect.setDepthClipping(nearClipping, farClipping);
+	
+	// // setup osc
+	// sender.setup(sendAddress, sendPort);
+	
+	// return true;
 }
 
 //--------------------------------------------------------------
-bool ofApp::saveSettings(const string xmlFile) {
+bool ofApp::saveSettings(const std::string xmlFile) {
 	
-	XmlSettings xml;
-	
-	xml.addTag("settings");
-	xml.pushTag("settings");
-		
-		xml.addComment(" general settings ");
-		xml.addComment(" which kinect ID to open (note: doesn't change when reloading); int ");
-		xml.addValue("kinectID", (int)kinectID);
-		xml.addComment(" display image: 0 - none, 1 - threshold, 2 - RGB, 3 - depth");
-		xml.addValue("displayImage", displayImage);
-		
-		xml.addComment(" tracking settings ");
-		xml.addTag("tracking");
-		xml.pushTag("tracking");
-			xml.addComment(" person finder depth clipping threshold; int 0 - 255 ");
-			xml.addValue("threshold", threshold);
-			xml.addComment(" kinect near clipping plane in cm; int ");
-			xml.addValue("nearClipping", (int)nearClipping);
-			xml.addComment(" kinect far clipping plane in cm; int ");
-			xml.addValue("farClipping", (int)farClipping);
-			xml.addComment(" minimum area to consider when looking for person blobs; int ");
-			xml.addValue("personMinArea", (int)personMinArea);
-			xml.addComment(" maximum area to consider when looking for person blobs; int ");
-			xml.addValue("personMaxArea", (int)personMaxArea);
-		xml.popTag();
-		
-		xml.addComment(" normalize overhead position coords, enable/disable; bool 0 or 1 ");
-		xml.addTag("normalize");
-		xml.pushTag("normalize");
-			xml.addComment(" normalized; 0 - width ");
-			xml.addValue("bNormalizeX", bNormalizeX);
-			xml.addComment(" normalized; 0 - height ");
-			xml.addValue("bNormalizeY", bNormalizeY);
-			xml.addComment(" normalized ; nearClipping - farClipping ");
-			xml.addValue("bNormalizeZ", bNormalizeZ);
-		xml.popTag();
-		
-		xml.addComment(" scale overhead position coords, performed after normalization ");
-		xml.addTag("scale");
-		xml.pushTag("scale");
-			xml.addComment(" enable/disable; bool 0 or 1 ");
-			xml.addValue("bScaleX", bScaleX);
-			xml.addValue("bScaleY", bScaleY);
-			xml.addValue("bScaleZ", bScaleZ);
-			xml.addComment(" scale amounts ");
-			xml.addValue("scaleXAmt", scaleXAmt);
-			xml.addValue("scaleYAmt", scaleXAmt);
-			xml.addValue("scaleZAmt", scaleZAmt);
-		xml.popTag();
-		
-		xml.addComment(" osc settings ");
-		xml.addTag("osc");
-		xml.pushTag("osc");
-			xml.addComment(" host destination address ");
-			xml.addValue("sendAddress", sendAddress);
-			xml.addComment(" host destination port ");
-			xml.addValue("sendPort", (int)sendPort);
-		xml.popTag();
-		
-	xml.popTag();
-	
-	if(!xml.saveFile(xmlFile)) {
-		ofLogWarning() << "Couldn't save settings: " << xml.doc.ErrorDesc();
+	ofXml xml;
+
+	ofXml root = xml.appendChild("settings");
+	root.appendChild("kinectID").set(kinectID);
+	root.appendChild("displayImage").set(displayImage);
+
+	ofXml tracking = root.appendChild("tracking");
+	tracking.appendChild("threshold").set(threshold);
+	tracking.appendChild("nearClipping").set(nearClipping);
+	tracking.appendChild("farClipping").set(farClipping);
+	tracking.appendChild("personMinArea").set(personMinArea);
+	tracking.appendChild("personMaxArea").set(personMaxArea);
+
+	ofXml normalize = root.appendChild("normalize");
+	normalize.appendChild("bNormalizeX").set(bNormalizeX);
+	normalize.appendChild("bNormalizeY").set(bNormalizeY);
+	normalize.appendChild("bNormalizeZ").set(bNormalizeZ);
+
+	ofXml scale = root.appendChild("scale");
+	scale.appendChild("bScaleX").set(bScaleX);
+	scale.appendChild("bScaleY").set(bScaleY);
+	scale.appendChild("bScaleZ").set(bScaleZ);
+	scale.appendChild("scaleXAmt").set(scaleXAmt);
+	scale.appendChild("scaleYAmt").set(scaleYAmt);
+	scale.appendChild("scaleZAmt").set(scaleZAmt);
+
+	ofXml osc = root.appendChild("osc");
+	osc.appendChild("sendAddress").set(sendAddress);
+	osc.appendChild("sendPort").set(sendPort);
+
+	if(!xml.save(xmlFile)) {
+		ofLogWarning() << "Couldn't save settings";
 			return false;
 	}
 	return true;
+
+	// XmlSettings xml;
+	
+	// xml.addTag("settings");
+	// xml.pushTag("settings");
+		
+	// 	xml.addComment(" general settings ");
+	// 	xml.addComment(" which kinect ID to open (note: doesn't change when reloading); int ");
+	// 	xml.addValue("kinectID", (int)kinectID);
+	// 	xml.addComment(" display image: 0 - none, 1 - threshold, 2 - RGB, 3 - depth");
+	// 	xml.addValue("displayImage", displayImage);
+		
+	// 	xml.addComment(" tracking settings ");
+	// 	xml.addTag("tracking");
+	// 	xml.pushTag("tracking");
+	// 		xml.addComment(" person finder depth clipping threshold; int 0 - 255 ");
+	// 		xml.addValue("threshold", threshold);
+	// 		xml.addComment(" kinect near clipping plane in cm; int ");
+	// 		xml.addValue("nearClipping", (int)nearClipping);
+	// 		xml.addComment(" kinect far clipping plane in cm; int ");
+	// 		xml.addValue("farClipping", (int)farClipping);
+	// 		xml.addComment(" minimum area to consider when looking for person blobs; int ");
+	// 		xml.addValue("personMinArea", (int)personMinArea);
+	// 		xml.addComment(" maximum area to consider when looking for person blobs; int ");
+	// 		xml.addValue("personMaxArea", (int)personMaxArea);
+	// 	xml.popTag();
+		
+	// 	xml.addComment(" normalize overhead position coords, enable/disable; bool 0 or 1 ");
+	// 	xml.addTag("normalize");
+	// 	xml.pushTag("normalize");
+	// 		xml.addComment(" normalized; 0 - width ");
+	// 		xml.addValue("bNormalizeX", bNormalizeX);
+	// 		xml.addComment(" normalized; 0 - height ");
+	// 		xml.addValue("bNormalizeY", bNormalizeY);
+	// 		xml.addComment(" normalized ; nearClipping - farClipping ");
+	// 		xml.addValue("bNormalizeZ", bNormalizeZ);
+	// 	xml.popTag();
+		
+	// 	xml.addComment(" scale overhead position coords, performed after normalization ");
+	// 	xml.addTag("scale");
+	// 	xml.pushTag("scale");
+	// 		xml.addComment(" enable/disable; bool 0 or 1 ");
+	// 		xml.addValue("bScaleX", bScaleX);
+	// 		xml.addValue("bScaleY", bScaleY);
+	// 		xml.addValue("bScaleZ", bScaleZ);
+	// 		xml.addComment(" scale amounts ");
+	// 		xml.addValue("scaleXAmt", scaleXAmt);
+	// 		xml.addValue("scaleYAmt", scaleXAmt);
+	// 		xml.addValue("scaleZAmt", scaleZAmt);
+	// 	xml.popTag();
+		
+	// 	xml.addComment(" osc settings ");
+	// 	xml.addTag("osc");
+	// 	xml.pushTag("osc");
+	// 		xml.addComment(" host destination address ");
+	// 		xml.addValue("sendAddress", sendAddress);
+	// 		xml.addComment(" host destination port ");
+	// 		xml.addValue("sendPort", (int)sendPort);
+	// 	xml.popTag();
+		
+	// xml.popTag();
+	
+	// if(!xml.saveFile(xmlFile)) {
+	// 	ofLogWarning() << "Couldn't save settings: " << xml.doc.ErrorDesc();
+	// 		return false;
+	// }
+	// return true;
 }
 
 //--------------------------------------------------------------
